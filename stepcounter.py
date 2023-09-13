@@ -1,6 +1,8 @@
+import argparse
+
 import matplotlib.pyplot as plt
 import numpy as np
-import argparse
+
 
 # Simple function to visualize 4 arrays that are given to it
 def visualize_data(timestamps, x_arr, y_arr, z_arr, s_arr):
@@ -41,6 +43,10 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
     return rv
 
 
+def count_steps_advanced(timestamps, x_arr, y_arr, z_arr):
+    return []
+
+
 # Calculate the magnitude of the given vector
 def magnitude(x, y, z):
     return np.linalg.norm((x, y, z))
@@ -78,15 +84,28 @@ def main():
     parser.add_argument(
         "-f", "--filename", help="Name of the file to read the data from", type=str
     )
+    parser.add_argument(
+        "-a",
+        "--algorithm",
+        help="Algorithm to use for step counting (simple or advanced)",
+        type=str,
+        default="simple",
+    )
     args = parser.parse_args()
     file_name = args.filename
-    # read data from a measurement file, change the inoput file name if needed
+    algorithm = args.algorithm
+    # Read data from a measurement file, change the inoput file name if needed
     timestamps, x_array, y_array, z_array = read_data("data/" + file_name)
     # Chek that the data does not produce errors
     if not check_data(timestamps, x_array, y_array, z_array):
         return
-    # Count the steps based on array of measurements from accelerometer
-    st = count_steps(timestamps, x_array, y_array, z_array)
+    # Check the type of algorithm to use for step counting
+    if algorithm == "simple":
+        print("Using simple algorithm for step counting")
+        # Count the steps based on array of measurements from accelerometer
+        st = count_steps(timestamps, x_array, y_array, z_array)
+    else:
+        st = count_steps_advanced(timestamps, x_array, y_array, z_array)
     # Print the result
     print(
         "This data contains " + str(len(st)) + " steps according to current algorithm"
