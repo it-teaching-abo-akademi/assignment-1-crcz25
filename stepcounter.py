@@ -24,11 +24,17 @@ def visualize_data(timestamps, x_arr, y_arr, z_arr, s_arr):
 
 
 # Function to read the data from the log file
-# TODO Read the measurements into array variables and return them
 def read_data(filename):
-    # TODO implementation
-    # return [timestamps], [x_array], [y_array], [z_array]
-    return [0], [0], [0], [0]
+    # Open the csv file for reading
+    data = np.loadtxt(filename, delimiter=",", dtype=np.float64)
+    # Reshape the data into separate arrays (time, x, y, z)
+    timestamps = data[:, 0].astype(np.int64)
+    x_array = data[:, 1]
+    y_array = data[:, 2]
+    z_array = data[:, 3]
+    # Delete the data variable to free memory
+    del data
+    return timestamps, x_array, y_array, z_array
 
 
 # Function to count steps.
