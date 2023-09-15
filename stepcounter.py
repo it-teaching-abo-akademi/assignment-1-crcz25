@@ -44,7 +44,7 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
     # See the pdf: pedometer-design-3-axis-digital-acceler fore more details
 
     # Declare parameters for step counting (using dynamic threshold and dynamic precision)
-    window_size = 50  # Window size for the algorithm (adjustable)
+    window_size = 15  # Window size for the algorithm (adjustable)
     precision_threshold = 0.5  # Fixed precision threshold (adjustable)
 
     # Process the data based on the window size
@@ -53,23 +53,23 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
     for x, y, z in zip(x_arr, y_arr, z_arr):
         magnitude_total_acc.append(magnitude(x, y, z))
     step_times = []  # Array to store the times when steps were detected
-    sample_old = magnitude_total_acc[0]  # Initialize the previous sample
-    sample_new = magnitude_total_acc[1]  # Initialize the current sample
-    sample_result = sample_old  # Initialize the sample result
+    sample_old = 0.0  # Initialize the previous sample
+    sample_new = 0.0  # Initialize the current sample
+    sample_result = 0.0  # Initialize the sample result
     thresholds = []  # For visualization
     maxs = []  # For visualization
     mins = []  # For visualization
 
     # Iterate over the data
     for i, time in enumerate(timestamps):
-        # Check which of the axes has the magnitude cl
-        # When a new data sample comes, sample_new is shifted to the sample_old register unconditionally
-        sample_old, sample_new = sample_new, magnitude_total_acc[i]
         # If the changes in acceleration are greater than a predefined precision, the newest sample result, is shifted to the sample_new register; otherwise the sample_new register will remain unchanged.
-        if abs(sample_new - sample_old) > precision_threshold:
-            sample_result = sample_new
+        sample_result = magnitude_total_acc[i]
+        if abs(sample_result - sample_old) > precision_threshold:
+            sample_new = sample_result
         else:
-            sample_result = sample_old
+            sample_new = sample_old
+        # The sample_old register is shifted to the sample_result register unconditionally
+        sample_old = sample_result
 
         # Calculate the maximum and minimum acceleration in the window
         maximum = np.max(magnitude_total_acc[i : i + window_size])
@@ -77,9 +77,8 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
         # Calculate the threshold for the window
         threshold = (maximum + minimum) / 2
         # A step is defined as happening if there is a negative slope of the acceleration plot (sample_new < sample_old) when the  acceleration curve crosses below the dynamic threshold.
-        # TODO: Check if this is correct
-        if sample_new < threshold and sample_old >= threshold:
-        # if sample_new < sample_old and sample_result < threshold:
+        if sample_new < sample_old and sample_new < threshold:
+            print("Step detected at time " + str(time))
             step_times.append(time)
         # Store the threshold for visualization
         thresholds.append(threshold)
