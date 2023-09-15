@@ -76,6 +76,7 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
         minimum = np.min(magnitude_total_acc[i : i + window_size])
         # Calculate the threshold for the window
         threshold = (maximum + minimum) / 2
+
         # A step is defined as happening if there is a negative slope of the acceleration plot (sample_new < sample_old) when the  acceleration curve crosses below the dynamic threshold.
         if sample_new < sample_old and sample_new < threshold:
             print("Step detected at time " + str(time))
@@ -107,7 +108,29 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
 
 
 def count_steps_advanced(timestamps, x_arr, y_arr, z_arr):
-    return []
+    # Filter the data using convolution with a moving average filter (kernel size 5)
+    kernel = np.ones(5) / 5
+    x_arr_conv = np.convolve(x_arr, kernel, mode="same")
+    y_arr_conv = np.convolve(y_arr, kernel, mode="same")
+    z_arr_conv = np.convolve(z_arr, kernel, mode="same")
+    # Calculate the magnitude of the total acceleration
+    magnitude_total_acc = []
+    for x, y, z in zip(x_arr, y_arr, z_arr):
+        magnitude_total_acc.append(magnitude(x, y, z))
+    # Plot the comparison of filtered and unfiltered data
+    fig, ax = plt.subplots()
+    ax.plot(timestamps, x_arr, color="red", linewidth=1.0, label="x")
+    ax.plot(timestamps, y_arr, color="green", linewidth=1.0, label="y")
+    ax.plot(timestamps, z_arr, color="blue", linewidth=1.0, label="z")
+    ax.plot(timestamps, x_arr_conv, color="orange", linewidth=1.0, label="x_conv")
+    ax.plot(timestamps, y_arr_conv, color="black", linewidth=1.0, label="y_conv")
+    ax.plot(timestamps, z_arr_conv, color="purple", linewidth=1.0, label="z_conv")
+    ax.set(xlabel="time (ms)", ylabel="magnitude", title="Step counter")
+    ax.legend()
+    ax.grid()
+    plt.show()
+    steps = count_steps(timestamps, x_arr_conv, y_arr_conv, z_arr_conv)
+    return steps
 
 
 # Calculate the magnitude of the given vector
