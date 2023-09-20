@@ -121,24 +121,25 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
     )
     ax[0].legend()
     ax[0].grid()
-    ax[1].plot(timestamps[:250], magnitude_total_acc[:250], color="blue", label="acc")
+    limit = round(len(timestamps)*0.15)
+    ax[1].plot(timestamps[:limit], magnitude_total_acc[:limit], color="blue", label="acc")
     ax[1].plot(
-        timestamps[WINDOW_SIZE // 2 : 250 - WINDOW_SIZE // 2],
-        thresholds[: 250 - WINDOW_SIZE],
+        timestamps[WINDOW_SIZE // 2 : limit - WINDOW_SIZE // 2],
+        thresholds[: limit - WINDOW_SIZE],
         color="orange",
         label="threshold",
         linestyle="dashed",
     )
     ax[1].plot(
-        timestamps[WINDOW_SIZE // 2 : 250 - WINDOW_SIZE // 2],
-        maxs[: 250 - WINDOW_SIZE],
+        timestamps[WINDOW_SIZE // 2 : limit - WINDOW_SIZE // 2],
+        maxs[: limit - WINDOW_SIZE],
         color="red",
         label="max",
         linestyle="dashed",
     )
     ax[1].plot(
-        timestamps[WINDOW_SIZE // 2 : 250 - WINDOW_SIZE // 2],
-        mins[: 250 - WINDOW_SIZE],
+        timestamps[WINDOW_SIZE // 2 : limit - WINDOW_SIZE // 2],
+        mins[: limit - WINDOW_SIZE],
         color="green",
         label="min",
         linestyle="dashed",
