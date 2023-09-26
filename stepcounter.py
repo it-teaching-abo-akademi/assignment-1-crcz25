@@ -28,7 +28,7 @@ def visualize_data(timestamps, x_arr, y_arr, z_arr, s_arr):
     plt.plot(timestamps, s_arr, color="black", linewidth=1.0)
     plt.plot(timestamps, m_arr, color="red", linewidth=1.0)
     plt.tight_layout()
-    plt.savefig("detections.png")
+    # plt.savefig("detections.png")
     plt.show()
 
 
@@ -121,8 +121,10 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
     )
     ax[0].legend()
     ax[0].grid()
-    limit = round(len(timestamps)*0.15)
-    ax[1].plot(timestamps[:limit], magnitude_total_acc[:limit], color="blue", label="acc")
+    limit = round(len(timestamps) * 0.2)
+    ax[1].plot(
+        timestamps[:limit], magnitude_total_acc[:limit], color="blue", label="acc"
+    )
     ax[1].plot(
         timestamps[WINDOW_SIZE // 2 : limit - WINDOW_SIZE // 2],
         thresholds[: limit - WINDOW_SIZE],
@@ -152,7 +154,24 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
     ax[1].legend()
     ax[1].grid()
     plt.tight_layout()
-    plt.savefig("stepcounter_simple_thresholds.png", bbox_inches="tight")
+    # plt.savefig("stepcounter_simple_thresholds.png", bbox_inches="tight")
+    plt.show()
+
+    # Plot the signal and the steps detected
+    fig, ax = plt.subplots()
+    ax.plot(timestamps, magnitude_total_acc, color="blue", label="acc")
+    ax.plot(
+        timestamps,
+        generate_step_array(timestamps, step_times),
+        color="black",
+        label=f"steps (n={len(step_times)})",
+        linestyle="dashed",
+    )
+    ax.set(xlabel="time (ms)", ylabel="magnitude", title="Step counter (Simple)")
+    ax.legend()
+    ax.grid()
+    plt.tight_layout()
+    # plt.savefig("stepcounter_adv_steps.png")
     plt.show()
 
     return step_times
@@ -161,6 +180,16 @@ def count_steps(timestamps, x_arr, y_arr, z_arr):
 def count_steps_advanced(timestamps, x_arr, y_arr, z_arr):
     # Create a gaussian kernel for filtering the data
     kernel = np.array([1, 4, 6, 4, 1]) / 16
+
+    # Plot the gaussian kernel
+    fig, ax = plt.subplots()
+    ax.bar(np.arange(len(kernel)), kernel, color="blue", label="gaussian kernel")
+    ax.set(title="Gaussian kernel")
+    ax.legend()
+    ax.grid()
+    plt.tight_layout()
+    # plt.savefig("stepcounter_adv_gaussian_kernel.png")
+    plt.show()
 
     # Apply the gaussian filter to each dimension of the data to pre-smooth the signal
     x_arr_conv = np.convolve(x_arr, kernel, mode="same")
@@ -185,7 +214,7 @@ def count_steps_advanced(timestamps, x_arr, y_arr, z_arr):
     ax[2].legend()
     ax[2].grid()
     plt.tight_layout()
-    plt.savefig("stepcounter_adv_og_vs_3axis_filt.png")
+    # plt.savefig("stepcounter_adv_og_vs_3axis_filt.png")
     plt.show()
 
     # Filter the data using a low-pass filter (cutoff frequency 0.2 Hz)
@@ -245,7 +274,26 @@ def count_steps_advanced(timestamps, x_arr, y_arr, z_arr):
     ax[1].legend()
     ax[1].grid()
     plt.tight_layout()
-    plt.savefig("stepcounter_adv_og_vs_filt_user_acc.png")
+    # plt.savefig("stepcounter_adv_og_vs_filt_user_acc.png")
+    plt.show()
+
+    # Plot the signal and the steps detected
+    fig, ax = plt.subplots()
+    ax.plot(
+        timestamps, magnitude_user_acc_filt, color="blue", label="user acceleration"
+    )
+    ax.plot(
+        timestamps,
+        generate_step_array(timestamps, steps),
+        color="black",
+        label=f"steps (n={len(steps)})",
+        linestyle="dashed",
+    )
+    ax.set(xlabel="time (ms)", ylabel="magnitude", title="Step counter (advanced)")
+    ax.legend()
+    ax.grid()
+    plt.tight_layout()
+    # plt.savefig("stepcounter_adv_steps.png")
     plt.show()
 
     return steps
@@ -265,7 +313,7 @@ def generate_step_array(timestamps, step_time):
     for i, time in enumerate(timestamps):
         if ctr < len(step_time) and step_time[ctr] <= time:
             ctr += 1
-            s_arr.append(100)
+            s_arr.append(20)
         else:
             s_arr.append(0)
     while len(s_arr) < len(timestamps):
