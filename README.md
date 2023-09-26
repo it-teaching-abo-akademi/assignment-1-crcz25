@@ -14,11 +14,10 @@ conda activate dev
 
 To run the code, run the following command in the terminal:
 ```bash
-python stepcounter.py -f <path_to_file> -a <algorithm> -w <window_size> -p <presicion_threshold>
+python stepcounter.py -f <path_to_file> -a <algorithm> -w <window_size> -p <precision_threshold>
 ```
 Where:
 - **path_to_file** is the path to the file containing the data. The file should be in the data folder.
 - **algorithm** is the algorithm used to calculate the step count. It can be either 'simple' or 'advanced'.
 - **window_size** is the size of the window used to calculate the step count.
-- **presicion_threshold** is the threshold used to determine if a step is valid or not.
-
+- **precision_threshold** is the threshold used to determine if a step is valid or not.
